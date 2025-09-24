@@ -1,11 +1,10 @@
-* {
+
+body {
+    text-align: center;
     background-color: rgb(237, 114, 53);
     color: rgb(2, 2, 95);
     font-family: sans-serif;
-    text-align: center;
 }
-
-
 
 h1 h3 {
     width: fit-content;
@@ -14,7 +13,6 @@ h1 h3 {
     color: whitesmoke;
     background-color: rgb(74, 131, 229);
 }
-
 
 
 h2 {
