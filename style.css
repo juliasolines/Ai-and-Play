@@ -11,23 +11,20 @@ h1 {
     color: white;
     background-color: rgb(218, 128, 68);
     font-size: 60px;
-    margin: 50px 300px 20px 300px;
+    max-width: 300px
 }
 
 h2 {
     color: rgb(218, 128, 68);
     font-size: 24px;
-    margin: 30px 300px 10px 300px;
+    max-width: 300px
 }
 
 p{
     color: rgb(2, 2, 95);
     max-width: 600px;
-    margin: 10px auto 30px auto;
-
 }
 
 ul{
     max-width: 600px;
-    margin: 10px auto 30px auto;
 }
