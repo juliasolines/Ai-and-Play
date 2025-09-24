@@ -2,8 +2,8 @@
 body {
     text-align: center;
     background-color: white;
-    color: rgb(2, 2, 95);
     font-family: sans-serif;
+    margin: 40px;
 }
 
 h1 {
@@ -16,5 +16,10 @@ h1 {
 h2 {
     color: rgb(218, 128, 68);
     font-size: 24px;
+}
 
+p{
+    color: rgb(2, 2, 95);
+    font-size: 12px;
+    
 }
