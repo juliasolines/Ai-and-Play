@@ -6,16 +6,15 @@ body {
     font-family: sans-serif;
 }
 
-h1 h3 {
-    width: fit-content;
-    margin: 0 auto;
+h1 {
     text-align: center;
-    color: whitesmoke;
-    background-color: rgb(74, 131, 229);
+    color: rgb(27, 160, 213);
+    background-color: rgb(218, 128, 68);
+    font-size: 34px;
 }
 
-
 h2 {
-    color: whitesmoke;
+    color: rgb(218, 128, 68);
+    font-size: 24px;
 
 }
