@@ -22,10 +22,12 @@ h2 {
 
 p{
     color: rgb(2, 2, 95);
-    margin: 10px 300px 30px 300px;
+    max-width: 600px;
+    margin: 10px auto 30px auto;
 
 }
 
 ul{
-    margin: 10px 400px;
+    max-width: 600px;
+    margin: 10px auto 30px auto;
 }
