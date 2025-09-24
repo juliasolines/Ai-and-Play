@@ -2,79 +2,51 @@
 <html>
     <head>
         <Title> Explaining A Site </Title>
-         <link rel='stylesheet' href='style.css'>
+         <link rel='stylesheet' href="style.css">
     </head>
-    <body style="margin: 100px">
-        <div id="Title" style="text-align: center;">
-            <h1>Understanding "ESA Star Mapper" - Apparent Magnitude</h1>
-            <h3>Julia Solines</h3>
-            <img src="https://scx2.b-cdn.net/gfx/news/2019/galaxy.jpg" width="1300" height="400" alt="Galaxy"><br>
-
+    <body>
+        <div class="title" >
+            <h1>BLINK FITNESS</h1>
+            <h3>The impossibilities of cancelling a gym membership</h3>
         </div>
-        <div id="intro" style="text-align: center;"> 
-            ESA Star Mapper is visualisation is an exploration of some central aspects of astrometric star catalogues, 
-            using data from ESA’s 1989 Hipparcos mission. This catalogue listed 117 955 stars, reporting their positions 
-            with unprecedented accuracy, alongside estimates of their distance from us and motions through the Galaxy. It 
-            was a huge advance on the best catalogues compiled from ground-based observations, which contained information 
-            for just over 8000 stars.<br><br>This interactive experience allows users to delve into this famous dataset, 
-            exploring the three-dimensional distribution of almost 60 000 stars from the Hipparcos Catalogue. Stars are visualised 
-            as a function of their brightness; it is also possible to show their colours, as well as names and parent constellations 
-            for the brightest stars. Users can get a sense of where in the sky stars were located in the past – or will be in the future
-            – based on their motions measured by Hipparcos. <a href='https://sci.esa.int/star_mapper/' target='_blank'>Check it out!</a>.  
+        <div class="intro" > 
+            Like all gyms, Blink Fitness has fake advertising, endless hidden costs and is extremely
+             hard to cancel. Gyms always make it embarrassing to cancel their memberships, but Blink
+              makes sure to punish and shame you for doing it. 
         </div> 
-        <div id="head">
-            <h2>Head</h2>
-            <p>"html class=no-js lang".</p>
-                <ul>
-                    <li>"class= no-js" means that JavaScript us not active in this Website.</li>
-                    <li>"lang" is probably an incomplete term, because lang shuld be followed 
-                        with "en", the language the site is written in. </li>
-                </ul>
-            <p>head</p>
-                <ul>
-                    <li> title tag: ESA Star Mapper meta tags: important information about the site that is not 
-                        displayed. Info like author, title, description, viewport, and device. </li>
-                    <li>meta tags: important information about the site that is not displayed. 
-                        Info like author, title, description, viewport, and device. </li>
-                    <li>link tags: inserting the logos. </li>
-                    <li>script tag: inserts javascript file. </li>
-                </ul>
+        <div class="hiddencosts">
+            <h2>HIDDEN COSTS</h2>
+            <p>Hidden costs are a dark pattern where the cost shown is remarkably less, but as soon as
+                 the customer reaches the final step to complete the purchase, the cost increases by 
+                 adding taxes and hidden fees.<br><br> Blink’s hidden costs include a $60 annual maintenance 
+                 fee on the first day of the second month. Even if you don’t choose to keep the membership
+                  for a whole year, you are still charged this maintenance fee upon starting the membership.</p>
+               
         </div>
-        <div id="body">
-            <h2>Body</h2>
-            <ul>
-                <li>Margin, padding, background color.<br>This defines the formatting 
-                    of the main page. </li><br>
-                <li>Canvas. <br>A simple solid color rectangle.</li><br>
-                <li>Star names.<br>Individual code that names each of the stars when the 
-                    "star name" button is enabled. </li><br>
-                <li>hr labels.<br>Thematic break that separates content in the page</li>
-                <li>Buttons and slider<br>A division within the code that include all the buttons for the site.
-                It also includes the slidebar in the bottom that allows the viewer to adjust the 
-                apparent magnitude.</li><br>
-                <iframe src="https://drive.google.com/file/d/1D2pphBrUyjKLpORB-LQzsIVEcijciesY/preview" 
-                    width="640" height="480" allow="autoplay"></iframe>
-                <li>Images and logos.<br>The logos of the page.</li><br>
-            </ul>
+        <div class="forcedcontinuity">
+            <h2>FORCED CONTINUITY</h2>
+            <p>Forced continuity is a dark pattern used by digital services with subscriptions models where
+                 users are asked to provide payment information while signing up for the trial period, and
+                later they are automatically charged without any notification. <br><br> Blink’s cancellation 
+                is practically impossible to get without the $60 cancellation fee. And even then, you are
+                required to send an email to blink or go in person to demonstrate the reason why you want
+                to cancel (you can also upload a document to their online platform, but nobody will respond).
+                After a couple of weeks, you will get an email saying that your cancellation form has been
+                 reviewed and that you will be charged the cancellation fee. <br> <br>
+                 There are 3 exceptions in which you can cancel without the cancellation fee: </p>
+            <ol>
+                <li>If you have a doctor's note proving that you are unable to do exercise for more than 6 months. </li>
+                <li>If you have proof of moving into a new house more than 25 miles from any blink location.  </li>
+                <li>If you die. Only valid by presenting a death certificate.</li>
+            </ol>
         </div>
-        <div id="Java">
-            <h2>JavaScript</h2>
-            <p>Each star was drawn separately as spheres, each with their own ID and starting coordinate. The JS 
-                code has multiple functions that react to the mouse movement in relation to the coordinates and
-                size of the stars and the "Distance from the Sun: xxx light years" heading.</p>
-            </p>
-            <iframe src="https://drive.google.com/file/d/1tetgmJQtcdVTe7sRMriuk0bTqti0iLFC/preview" 
-            width="640" height="480" allow="autoplay"></iframe>
-            <p>The image above shows the code used for reactions to the mouse movements. 
-                It assigned a different value to each movement (mouseup or touchstart for example)
-                and then later on these values are used to deliver the value and either move the background image
-                around or to enlarge the plotted stars.
-            </p><br>
-            <iframe src="https://drive.google.com/file/d/1MvPTGZMoie8gJpjsYWO4Xa8S0tQWudNa/preview" width="640" height="480" allow="autoplay"></iframe>
-            <iframe src="https://drive.google.com/file/d/1Jl-vnDGVhVBW0PYD7hWhYYxJuJevP3LE/preview" width="640" height="480" allow="autoplay"></iframe>
-            <p>The image on the left represents the stars and background image when the mouse is in the lower quarter of the trackpad. 
-                The image to the right represents the stars and background when the mouse is at the top of the trackpad. 
-            </p>
+        <div class="roachmodel">
+            <h2>ROACH MODEL</h2>
+            <p>Roach model is a dark pattern that makes it easy for users to get into a situation but hard
+                 to get out of. Memberships and subscriptions usually have a Roach model.<br><br>
+                Blink advertises a “Flash Sale” with a $0 joining fee. Although it may seem like it, 
+                this does not mean it will cost you $0 to join the gym. It will still cost you the $39 
+                of the usual monthly membership cost, simply without the joining fee.</p>
         </div>
         
     </body>
