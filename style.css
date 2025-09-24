@@ -1,5 +1,21 @@
 * {
-    background-color: orange;
-    color: blue;
+    background-color: rgb(237, 114, 53);
+    color: skyblue;
     font-family: sans-serif;
+}
+
+.title {
+    text-align: center;
+    color: whitesmoke;
+    background-color: rgb(74, 131, 229);
+    box-sizing: border-box;
+}
+
+.intro {
+    text-align: center;
+    box-sizing:content-box;
+}
+
+.forcedcontinuity.hiddencosts.roachmodel {
+    text-align: center;
 }
