@@ -8,9 +8,10 @@ body {
 
 h1 {
     text-align: center;
-    color: rgb(27, 160, 213);
+    color: white;
     background-color: rgb(218, 128, 68);
-    font-size: 34px;
+    font-size: 60px;
+    margin: 100px 200px;
 }
 
 h2 {
@@ -21,5 +22,5 @@ h2 {
 p{
     color: rgb(2, 2, 95);
     font-size: 12px;
-    
+
 }
