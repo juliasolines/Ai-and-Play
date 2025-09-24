@@ -12,19 +12,25 @@ h1 {
     background-color: rgb(218, 128, 68);
     font-size: 60px;
     max-width: 300px
+    margin: 0 auto;
 }
 
 h2 {
     color: rgb(218, 128, 68);
     font-size: 24px;
     max-width: 300px
+    margin: 0 auto;
 }
 
 p{
+    text-align: center;
     color: rgb(2, 2, 95);
     max-width: 600px;
+    margin: 0 auto;
 }
 
 ul{
+    text-align: center;
     max-width: 600px;
+    margin: 0 auto;
 }
