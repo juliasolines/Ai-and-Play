@@ -1,21 +1,23 @@
 * {
     background-color: rgb(237, 114, 53);
-    color: blue;
+    color: rgb(2, 2, 95);
     font-family: sans-serif;
+    text-align: center;
 }
 
-.title {
+
+
+h1 h3 {
+    width: fit-content;
+    margin: 0 auto;
     text-align: center;
     color: whitesmoke;
     background-color: rgb(74, 131, 229);
-    box-sizing: border-box;
 }
 
-.intro {
-    text-align: center;
-    box-sizing:content-box;
-}
 
-.forcedcontinuity.hiddencosts.roachmodel {
-    text-align: center;
+
+h2 {
+    color: whitesmoke;
+
 }
