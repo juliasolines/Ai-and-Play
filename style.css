@@ -2,11 +2,41 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  background: #f9f6f1; /* paper-like background */
+  background: whitesmoke;
+  /* background-image: url(Images/background-texture-nest-termite-wooden-wall_483511-1342.jpg);
+  background-repeat: no-repeat;   /* don’t tile */
+  /* background-position: center;    /* keep it centered */
+  /* background-size: cover;  */  
 }
 
 canvas {
   display: block;
   width: 100vw;
   height: 100vh;
+}
+
+.controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+}
+
+.controls button {
+  padding: 10px 10px;
+  font-size: 14px;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: black;
+  border-radius: 8px;
+  background: rgb(234, 231, 202);
+  color: rgb(22, 10, 10);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.controls button:hover {
+  color: brown;
+  background: rgb(187, 234, 117);
 }
