@@ -12,7 +12,7 @@ let net = null;
 let stream = null;
 let running = false;
 let particles = [];
-const PARTICLE_COUNT = 700; // tune for performance
+const PARTICLE_COUNT = 3000; // tune for performance
 const SAMPLE_STEP = 8; // sample every 8 px; higher -> faster, lower -> more accurate
 
 // make canvas full-window sized
@@ -34,7 +34,7 @@ function initParticles(){
       x: Math.random()*drawCanvas.width,
       y: Math.random()*drawCanvas.height,
       vx: 0, vy: 0,
-      size: 1 + Math.random()*2.5,
+      size: 3 + Math.random()*3,
       targetIndex: Math.floor(Math.random()*1000), // starting dummy
     });
   }
@@ -205,12 +205,40 @@ async function animateLoop(){
     const s = p.size;
     const alpha = Math.max(0.05, 1 - Math.min(prox / 150, 1));
     // color based on distance (you can tweak)
-    drawCtx.beginPath();
-    drawCtx.fillStyle = `rgba(120,220,190,${alpha*0.9})`;
-    drawCtx.arc(p.x, p.y, s + (1-alpha)*1.5, 0, Math.PI*2);
-    drawCtx.fill();
+    
+    drawTermite(drawCtx, p.x, p.y, s, alpha);
+
   }
   drawCtx.globalCompositeOperation = 'source-over';
+
+function drawTermite(ctx, x, y, size, alpha) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(0.7, 0.7);      // optional: shrink a little
+  ctx.rotate(Math.random() * Math.PI * 2); // random orientation
+  ctx.globalAlpha = alpha * 0.95;
+
+  // head
+  ctx.beginPath();
+  ctx.fillStyle = "#300505";
+  ctx.arc(size * 3.2, 0, size * 0.9, 0, Math.PI * 2);
+  ctx.fill();
+
+  // body (oval)
+  ctx.beginPath();
+  ctx.fillStyle = "#333";
+  ctx.ellipse(0, 0, size * 1.5, size, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // middle
+  ctx.beginPath();
+  ctx.fillStyle = "#222";
+  ctx.arc(size * 2, 0, size * 0.7, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.restore();
+}
+
 
   // update status
   statusEl.textContent = `running — points: ${bodyPoints.length} — particles: ${particles.length}`;
@@ -218,3 +246,4 @@ async function animateLoop(){
   // next frame
   requestAnimationFrame(animateLoop);
 }
+
