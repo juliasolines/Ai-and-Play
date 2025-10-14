@@ -8,14 +8,14 @@
 </head>
 <body>
   <div class="ui">
-    <h1>Body-following Particles</h1>
+    <!-- <h1>Body-following Particles</h1> -->
     <div class="controls">
       <button id="startBtn">Start camera & model</button>
       <button id="stopBtn" disabled>Stop</button>
       <label><input id="showVideo" type="checkbox" /> Show video</label>
       <small id="status">idle</small>
     </div>
-    <p class="hint">Make sure you serve this page over HTTPS or via localhost (browser requires secure context for camera).</p>
+    <!-- <p class="hint">Make sure you serve this page over HTTPS or via localhost (browser requires secure context for camera).</p> -->
   </div>
 
   <!-- Hidden video input from camera -->
@@ -30,6 +30,10 @@
   <!-- TensorFlow.js and BodyPix (CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@latest/dist/body-pix.min.js"></script>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
   <script src="script.js"></script>
 </body>
