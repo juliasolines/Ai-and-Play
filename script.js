@@ -109,7 +109,12 @@ async function animateLoop(){
   sampleCanvas.width = video.videoWidth || sampleCanvas.width;
   sampleCanvas.height = video.videoHeight || sampleCanvas.height;
 
-  sampleCtx.drawImage(video, 0, 0, sampleCanvas.width, sampleCanvas.height);
+  // mirror the video before processing
+  sampleCtx.save();
+  sampleCtx.scale(-1, 1);
+  sampleCtx.drawImage(video, -sampleCanvas.width, 0, sampleCanvas.width, sampleCanvas.height);
+  sampleCtx.restore();
+
 
   // segmentPerson returns a single-person binary mask suitable for our use
   // segmentation has .data (Uint8Array) with 1 for person pixel, 0 for not-person
