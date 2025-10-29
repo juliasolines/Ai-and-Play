@@ -275,7 +275,7 @@ async function animateLoop() {
   drawCtx.font = `${fontSize}px monospace`;
   
   // 4. TRAIL: Draw the fading trail (Cyan Dots)
-  drawCtx.fillStyle = "#f2d73bff"; // Cyan color
+  drawCtx.fillStyle = "#01d10eff"; // Cyan color
   
   for (const trail of movementTrail) {
       const age = now - trail.timestamp;

@@ -1,0 +1,99 @@
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centers horizontally */
+  justify-content: center; /* centers vertically */
+  margin: 0;
+  font-family: "Geo", sans-serif;
+  background-color: antiquewhite;
+  color: #000000;
+ 
+}
+
+/* button {
+  font-family: "Geo", sans-serif;
+  margin-top: 20px;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #00ffcc;
+  color: #111;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  background-color: #00ccaa;
+} */
+
+h1{
+  display: flex;
+  height: 50vh;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  font-family: "Geo", sans-serif;
+  margin: 100px;
+  font: "Sensation","Sans Serif";
+  color: rgb(64, 66, 61);
+  font-size: 60px;
+}
+
+/* Main Page */
+
+a {
+  font-family: "Geo", sans-serif;
+  background-color: antiquewhite;
+  color: #77671f;
+  text-decoration: none;
+  font-size: 30px;
+  text-align: center;
+  justify-content: center;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+body.main{
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* centers horizontally */
+  justify-content: center; /* centers vertically */
+  margin: 0;
+  font-family: "Geo", sans-serif;
+  background-color: antiquewhite;
+  color: #000000;
+}
+
+h3{
+  margin: 15px;
+  text-align: center;
+   font-size: 25px;
+}
+
+h2{
+  text-align: center;
+  font-size: 30px;
+}
+
+.map {
+      align-items: center;
+      width: 1200px; /* or desired width */
+      height: 600px; /* or desired height */
+      /* overflow: hidden; */
+      margin: 200px, 100px, 30px;
+    }
+
+    .map iframe {
+      align-items: center;
+      margin-top: -50px; /* Adjust this value based on the header's height */
+      width: 100%;
+      height: calc(100% + 50px); /* Adjust to compensate for the margin */
+      border: 0;
+    }
+
+  
