@@ -53,4 +53,6 @@ html,body{
   box-shadow:0 6px 20px rgba(0,0,0,0.6);
   z-index:15;
   display:none;
+  transform: scaleX(-1);
+
 }

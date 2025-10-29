@@ -1,253 +1,347 @@
-// script.js
-let video = document.getElementById('video');
-let drawCanvas = document.getElementById('draw');
-let sampleCanvas = document.getElementById('sample');
-let startBtn = document.getElementById('startBtn');
-let stopBtn = document.getElementById('stopBtn');
-let statusEl = document.getElementById('status');
-let showVideoCheckbox = document.getElementById('showVideo');
+// --- GLOBAL SETUP AND CONSTANTS (Ensure all HTML elements are defined above) ---
+let video = document.getElementById("video");
+let drawCanvas = document.getElementById("draw");
+let sampleCanvas = document.getElementById("sample");
+let startBtn = document.getElementById("startBtn");
+let stopBtn = document.getElementById("stopBtn");
+let statusEl = document.getElementById("status");
+let showVideoCheckbox = document.getElementById("showVideo");
 
 let drawCtx, sampleCtx;
 let net = null;
 let stream = null;
 let running = false;
-let particles = [];
-const PARTICLE_COUNT = 3000; // tune for performance
-const SAMPLE_STEP = 8; // sample every 8 px; higher -> faster, lower -> more accurate
 
-// make canvas full-window sized
-function resizeCanvases(){
+const SAMPLE_STEP = 8;
+const BODY_LETTER_COUNT = 3000;
+const FLY_SPEED = 0.05; // lower = slower, smoother
+
+// Trail variables (MUST be defined globally)
+let movementTrail = [];
+const TRAIL_DURATION = 2000; // 2 seconds in milliseconds
+
+let bodyLetters = [];
+let flyingLetters = [];
+let fixedLetters = [];
+let nextTextX = 10;
+let nextTextY = 20;
+const lineHeight = 14;
+const fontSize = 12;
+const margin = 10;
+
+// silence timer
+let silenceTimeout = null;
+let lastSpeechTime = Date.now();
+
+// --- UTILITY FUNCTIONS ---
+function resizeCanvases() {
   drawCanvas.width = innerWidth;
   drawCanvas.height = innerHeight;
   sampleCanvas.width = video.videoWidth || 640;
   sampleCanvas.height = video.videoHeight || 480;
 }
-window.addEventListener('resize', () => {
-  resizeCanvases();
-});
+window.addEventListener("resize", resizeCanvases);
 
-// create particles with random positions
-function initParticles(){
-  particles = [];
-  for(let i=0;i<PARTICLE_COUNT;i++){
-    particles.push({
-      x: Math.random()*drawCanvas.width,
-      y: Math.random()*drawCanvas.height,
-      vx: 0, vy: 0,
-      size: 3 + Math.random()*3,
-      targetIndex: Math.floor(Math.random()*1000), // starting dummy
+function randomLetter() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return chars[Math.floor(Math.random() * chars.length)];
+}
+
+function initBodyLetters() {
+  bodyLetters = [];
+  for (let i = 0; i < BODY_LETTER_COUNT; i++) {
+    bodyLetters.push({
+      x: Math.random() * drawCanvas.width,
+      y: Math.random() * drawCanvas.height,
+      vx: 0,
+      vy: 0,
+      letter: randomLetter(),
     });
   }
 }
 
-// helper to sleep
-function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-// start camera and model
-startBtn.addEventListener('click', async () => {
+// --- START / STOP CONTROLS ---
+startBtn.addEventListener("click", async () => {
   if (running) return;
   startBtn.disabled = true;
-  statusEl.textContent = 'starting camera...';
+  statusEl.textContent = "Starting camera and model...";
 
   try {
-    // request camera (front camera if available)
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "user" },
+      audio: true,
+    });
     video.srcObject = stream;
+    // Wait for video metadata to load before resizing
+    await new Promise(resolve => video.onloadedmetadata = resolve); 
     await video.play();
 
-    // create contexts; sampleCtx willReadFrequently because we call getImageData frequently
-    drawCtx = drawCanvas.getContext('2d');
-    sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
-
+    drawCtx = drawCanvas.getContext("2d");
+    sampleCtx = sampleCanvas.getContext("2d", { willReadFrequently: true });
     resizeCanvases();
-    initParticles();
-    statusEl.textContent = 'loading model...';
+    initBodyLetters();
 
-    // Load BodyPix model (from CDN). This may take a second.
-    // Using defaults; you can tune for speed/accuracy in options below.
+    statusEl.textContent = "Loading BodyPix model...";
     net = await bodyPix.load({
-      architecture: 'MobileNetV1', // lighter and faster in browser
+      architecture: "MobileNetV1",
       outputStride: 16,
       multiplier: 0.75,
-      quantBytes: 2
+      quantBytes: 2,
     });
 
-    statusEl.textContent = 'model loaded — running';
     running = true;
     stopBtn.disabled = false;
     showVideoCheckbox.disabled = false;
+    statusEl.textContent = "Running";
+
+    startSpeechRecognition();
     animateLoop();
   } catch (err) {
     console.error(err);
-    statusEl.textContent = 'error: ' + (err.message || err);
+    statusEl.textContent = "Error: " + err.message;
     startBtn.disabled = false;
   }
 });
 
-// stop everything
-stopBtn.addEventListener('click', () => {
+stopBtn.addEventListener("click", () => {
   running = false;
   startBtn.disabled = false;
   stopBtn.disabled = true;
-  statusEl.textContent = 'stopped';
+  showVideoCheckbox.disabled = true;
+  statusEl.textContent = "Stopped.";
+  clearTimeout(silenceTimeout); 
   if (stream) {
-    stream.getTracks().forEach(t => t.stop());
+    stream.getTracks().forEach((t) => t.stop());
     stream = null;
   }
-  if (video) { video.pause(); video.srcObject = null; }
+  video.pause();
+  video.srcObject = null;
 });
 
-// toggle showing raw video
-showVideoCheckbox.addEventListener('change', () => {
-  video.style.display = showVideoCheckbox.checked ? 'block' : 'none';
-});
+// --- SPEECH RECOGNITION ---
+function startSpeechRecognition() {
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn("Speech recognition not supported.");
+    return;
+  }
 
-// Main animation + segmentation loop
-async function animateLoop(){
+  const recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = "en-US";
+
+  recognition.onresult = (event) => {
+    let finalTranscript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        finalTranscript += result[0].transcript + " ";
+      }
+    }
+
+    if (finalTranscript) {
+      addWordsToFlyingLetters(finalTranscript);
+      lastSpeechTime = Date.now();
+      resetSilenceTimer();
+    }
+  };
+
+  recognition.onerror = (e) => console.error("Speech error:", e);
+  recognition.onend = () => {
+    if(running) recognition.start(); 
+  } 
+  recognition.start();
+  resetSilenceTimer();
+}
+
+function resetSilenceTimer() {
+  clearTimeout(silenceTimeout);
+  silenceTimeout = setTimeout(() => {
+    const now = Date.now();
+    if (now - lastSpeechTime >= 1000) {
+      addWordsToFlyingLetters("   "); 
+    }
+    if(running) resetSilenceTimer(); 
+  }, 1000);
+}
+
+// --- FLYING LETTERS ---
+function addWordsToFlyingLetters(text) {
+  drawCtx.font = `${fontSize}px monospace`;
+  const letters = text.split("");
+
+  for (let ch of letters) {
+    if (ch === " ") {
+      nextTextX += drawCtx.measureText(" ").width * 3;
+      if (nextTextX > drawCanvas.width - margin) {
+        nextTextX = margin;
+        nextTextY += lineHeight;
+      }
+      continue;
+    }
+
+    const source = bodyLetters[Math.floor(Math.random() * bodyLetters.length)];
+    if (!source) continue;
+
+    const targetX = nextTextX;
+    const targetY = nextTextY;
+    nextTextX += drawCtx.measureText(ch).width + 1;
+    if (nextTextX > drawCanvas.width - margin) {
+      nextTextX = margin;
+      nextTextY += lineHeight;
+    }
+    if (nextTextY > drawCanvas.height - margin) {
+      nextTextY = margin + fontSize;
+    }
+
+    flyingLetters.push({
+      x: source.x,
+      y: source.y,
+      letter: ch,
+      tx: targetX,
+      ty: targetY,
+      arrived: false,
+    });
+
+    source.letter = randomLetter();
+  }
+}
+
+// --- ANIMATION LOOP ---
+async function animateLoop() {
   if (!running) return;
-  // draw video into sample canvas at its natural resolution
+  
+  const now = Date.now();
   sampleCanvas.width = video.videoWidth || sampleCanvas.width;
   sampleCanvas.height = video.videoHeight || sampleCanvas.height;
 
-  // mirror the video before processing
+  // 1. Segmentation
   sampleCtx.save();
-  sampleCtx.scale(-1, 1);
-  sampleCtx.drawImage(video, -sampleCanvas.width, 0, sampleCanvas.width, sampleCanvas.height);
+  sampleCtx.scale(-1, 1); 
+  sampleCtx.drawImage(
+    video,
+    -sampleCanvas.width,
+    0,
+    sampleCanvas.width,
+    sampleCanvas.height
+  );
   sampleCtx.restore();
 
-
-  // segmentPerson returns a single-person binary mask suitable for our use
-  // segmentation has .data (Uint8Array) with 1 for person pixel, 0 for not-person
-  let segmentation = await net.segmentPerson(sampleCanvas, {
-    internalResolution: 'medium',
-    segmentationThreshold: 0.6
+  const segmentation = await net.segmentPerson(sampleCanvas, {
+    internalResolution: "medium",
+    segmentationThreshold: 0.6,
   });
 
-  // build a list of body points by sampling the segmentation mask
   const bodyPoints = [];
   const sw = segmentation.width;
   const sh = segmentation.height;
-  const mask = segmentation.data; // Uint8Array length = sw*sh
+  const mask = segmentation.data;
 
-  // sample grid to reduce data
   for (let y = 0; y < sh; y += SAMPLE_STEP) {
     for (let x = 0; x < sw; x += SAMPLE_STEP) {
       const idx = y * sw + x;
-      if (mask[idx] === 1) {
-        // map sample coords to drawCanvas coords (fullscreen)
-        const dx = x / sw * drawCanvas.width;
-        const dy = y / sh * drawCanvas.height;
+      if (mask[idx]) {
+        const dx = (x / sw) * drawCanvas.width;
+        const dy = (y / sh) * drawCanvas.height;
         bodyPoints.push([dx, dy]);
       }
     }
   }
 
-  // clear draw canvas and optionally draw a faint background
-  drawCtx.clearRect(0,0,drawCanvas.width, drawCanvas.height);
+  // 2. TRAIL: Capture and Prune
+  if (bodyPoints.length > 0) {
+      movementTrail.push({
+          points: bodyPoints.slice(), 
+          timestamp: now,
+      });
+  }
+  
+  const twoSecondsAgo = now - TRAIL_DURATION;
+  movementTrail = movementTrail.filter(trail => trail.timestamp >= twoSecondsAgo);
 
-  // optionally: draw segmented mask for debugging
-  // drawCtx.fillStyle = 'rgba(100,200,240,0.06)';
-  // for (const p of bodyPoints) drawCtx.fillRect(p[0], p[1], 3, 3);
 
-  // For each particle, move toward a nearby body point (or wander)
-  for (let i = 0; i < particles.length; i++){
-    const p = particles[i];
+  // 3. Drawing Setup & Optional Video Feed
+  drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  
+  if (showVideoCheckbox.checked) {
+     drawCtx.save();
+     drawCtx.scale(-1, 1);
+     drawCtx.drawImage(video, -drawCanvas.width, 0, drawCanvas.width, drawCanvas.height);
+     drawCtx.restore();
+  }
 
+  drawCtx.font = `${fontSize}px monospace`;
+  
+  // 4. TRAIL: Draw the fading trail (Cyan Dots)
+  drawCtx.fillStyle = "#f2d73bff"; // Cyan color
+  
+  for (const trail of movementTrail) {
+      const age = now - trail.timestamp;
+      const alpha = 0.5 * (1 - (age / TRAIL_DURATION)); // Fades from 0.5 to 0
+      
+      drawCtx.globalAlpha = alpha;
+      
+      for (const [x, y] of trail.points) {
+          // Draw small dots
+          drawCtx.fillRect(x, y, 2, 2); 
+      }
+  }
+  
+  // 5. Update and Draw Body Letters (RANDOM ATTRACTION REVERTED)
+  drawCtx.fillStyle = "#000000ff"; // Bright Cyan for letters
+  
+  for (let p of bodyLetters) {
     if (bodyPoints.length) {
-      // pick a random subset to search (faster than full nearest neighbor)
-      const tries = 8;
-      let best = null;
-      let bestDist = 1e9;
-      for (let t=0;t<tries;t++){
-        const cand = bodyPoints[Math.floor(Math.random()*bodyPoints.length)];
-        const dx = cand[0] - p.x;
-        const dy = cand[1] - p.y;
-        const d = dx*dx + dy*dy;
-        if (d < bestDist){ bestDist = d; best = cand; }
-      }
-      if (best) {
-        // move towards target with easing
-        const tx = best[0], ty = best[1];
-        const ax = (tx - p.x) * 0.12;
-        const ay = (ty - p.y) * 0.12;
-        p.vx = p.vx * 0.7 + ax;
-        p.vy = p.vy * 0.7 + ay;
-      }
+      // Attraction target is a RANDOM point on the body contour (causes clumping, but fluid motion)
+      const randIndex = Math.floor(Math.random() * bodyPoints.length);
+      const candX = bodyPoints[randIndex][0];
+      const candY = bodyPoints[randIndex][1];
+          
+      // Original attraction strength and damping
+      const ax = (candX - p.x) * 0.12;
+      const ay = (candY - p.y) * 0.12;
+      p.vx = p.vx * 0.7 + ax;
+      p.vy = p.vy * 0.7 + ay;
     } else {
-      // no body points: slow drifting
+      // No body detected, letters drift slowly
       p.vx *= 0.95;
       p.vy *= 0.95;
     }
 
-    // integrate velocity
     p.x += p.vx;
     p.y += p.vy;
 
-    // boundary wrap
-    if (p.x < -20) p.x = drawCanvas.width + 20;
-    if (p.x > drawCanvas.width + 20) p.x = -20;
-    if (p.y < -20) p.y = drawCanvas.height + 20;
-    if (p.y > drawCanvas.height + 20) p.y = -20;
+    drawCtx.globalAlpha = 0.7;
+    drawCtx.fillText(p.letter, p.x, p.y);
   }
 
-  // draw particles: style depends on distance to nearest body point (glow)
-  // draw a few layers for depth
-  drawCtx.globalCompositeOperation = 'lighter';
-  for (let i = 0; i < particles.length; i++){
-    const p = particles[i];
-    // find approximate proximity by sampling some body points
-    let prox = 1e9;
-    if (bodyPoints.length) {
-      for (let t=0;t<6;t++){
-        const cand = bodyPoints[Math.floor(Math.random()*bodyPoints.length)];
-        const dx = cand[0] - p.x;
-        const dy = cand[1] - p.y;
-        const d = Math.sqrt(dx*dx + dy*dy);
-        if (d < prox) prox = d;
-      }
-    } else prox = 2000;
+  // 6. Flying letters (Target text, original white/gray color)
+  drawCtx.fillStyle = "#000000ff"; 
+  for (let f of flyingLetters) {
+    const dx = f.tx - f.x;
+    const dy = f.ty - f.y;
+    f.x += dx * FLY_SPEED;
+    f.y += dy * FLY_SPEED;
 
-    const s = p.size;
-    const alpha = Math.max(0.05, 1 - Math.min(prox / 150, 1));
-    // color based on distance (you can tweak)
-    
-    drawTermite(drawCtx, p.x, p.y, s, alpha);
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+      f.arrived = true;
+      fixedLetters.push({ x: f.tx, y: f.ty, letter: f.letter });
+    }
 
+    drawCtx.globalAlpha = 0.9;
+    drawCtx.fillText(f.letter, f.x, f.y);
   }
-  drawCtx.globalCompositeOperation = 'source-over';
 
-function drawTermite(ctx, x, y, size, alpha) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(0.7, 0.7);      // optional: shrink a little
-  ctx.rotate(Math.random() * Math.PI * 2); // random orientation
-  ctx.globalAlpha = alpha * 0.95;
+  flyingLetters = flyingLetters.filter((f) => !f.arrived);
 
-  // head
-  ctx.beginPath();
-  ctx.fillStyle = "#300505";
-  ctx.arc(size * 3.2, 0, size * 0.9, 0, Math.PI * 2);
-  ctx.fill();
+  // 7. Fixed text
+  drawCtx.globalAlpha = 1;
+  for (let f of fixedLetters) {
+    drawCtx.fillText(f.letter, f.x, f.y);
+  }
 
-  // body (oval)
-  ctx.beginPath();
-  ctx.fillStyle = "#333";
-  ctx.ellipse(0, 0, size * 1.5, size, 0, 0, Math.PI * 2);
-  ctx.fill();
-
-  // middle
-  ctx.beginPath();
-  ctx.fillStyle = "#222";
-  ctx.arc(size * 2, 0, size * 0.7, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.restore();
-}
-
-
-  // update status
-  statusEl.textContent = `running — points: ${bodyPoints.length} — particles: ${particles.length}`;
-
-  // next frame
+  statusEl.textContent = `Running — Trail: ${movementTrail.length} pts, Body: ${bodyPoints.length} pts, Flying: ${flyingLetters.length}`;
   requestAnimationFrame(animateLoop);
 }
