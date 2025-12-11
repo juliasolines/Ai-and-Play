@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colegio Simon Bolivar</title>
+    <style>
+        /* 1. Basic Reset */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background-color: #f0f0f0; /* Matches your Hub Color */
+        }
+
+        /* 2. The Title Screen Overlay */
+        #title-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            color: #333;
+            background-color: #f0f0f0; /* Covers the 3D scene */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 999; /* Sits on top of everything */
+            transition: opacity 1.5s ease-out; /* Slow fade out */
+            cursor: pointer; /* Shows hand icon */
+        }
+
+        /* 3. Text Styling */
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #333;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        .click-instruction {
+            font-size: 0.9rem;
+            color: #999;
+            margin-top: 50px;
+            animation: pulse 2s infinite;
+        }
+
+        /* 4. Animation for "Click to Start" */
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
+        /* 5. Utility Class to Hide Screen */
+        .hidden {
+            opacity: 0;
+            pointer-events: none; /* Lets clicks pass through to 3D */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="title-screen">
+        
+        
+        <p>
+            The Simon Bolivar School in Quito, Ecuador was reconstructed into militarized police headquarters. These are the last 
+            remaining pictures of the school before its transformation. The increased militarization of our cities and 
+            the interference of the US government in Ecuadorian politics threatens the lives of the children
+            who, more than anything, should have access to safe education.  <br><br> 
+        </p>
+        
+        <div class="click-instruction">[ CLICK ANYWHERE TO ENTER ]</div>
+        </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module" src="./main.js"></script>
+
+</body>
+</html>
